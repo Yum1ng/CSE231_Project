@@ -20,13 +20,15 @@ using namespace std;
 namespace {
 struct CountDynamicInstructions : public FunctionPass {
   static char ID;
+  Module* module;
   // Module* module;
   // Constant* lib231UpdateInstr;
   // Constant* lib231PrintInstr;
   //LLVMContext* context;
   CountDynamicInstructions() : FunctionPass(ID) {}
 
-  bool doInitialization(Module &) override {
+  bool doInitialization(Module &M) override {
+    module = &M;
     // module = &M;
     // LLVMContext& context = module->getContext();
     //context = &(module->getContext()):
@@ -40,7 +42,6 @@ struct CountDynamicInstructions : public FunctionPass {
   }
 
   bool runOnFunction(Function &F) override {
-    Module* module = F.getParent();
     LLVMContext& context = module->getContext();
     Constant* lib231UpdateInstr = module->getOrInsertFunction("updateInstrInfo",Type::getVoidTy(context),Type::getInt32Ty(context),Type::getInt32PtrTy(context),Type::getInt32PtrTy(context));
 
@@ -77,14 +78,18 @@ struct CountDynamicInstructions : public FunctionPass {
       lib231Args.push_back(irBuilder.CreatePointerCast(values_global, Type::getInt32PtrTy(context)));
 
       irBuilder.CreateCall(lib231UpdateInstr,lib231Args);
+      // if((string)((B->getTerminator())->getOpcodeName()) == "ret"){
+      //   irBuilder.CreateCall(lib231PrintInstr);
+      // }
       for (BasicBlock::iterator I = B->begin(), IE = B->end(); I != IE; ++I) {
         if ((string) I->getOpcodeName() == "ret") {
+          errs() <<"reach ret"<<'\n';
           irBuilder.SetInsertPoint(&*I);
           irBuilder.CreateCall(lib231PrintInstr);
         }
       }
     }
-    return true;
+    return false;
   }
 }; // end of struct TestPass
 }  // end of anonymous namespace
