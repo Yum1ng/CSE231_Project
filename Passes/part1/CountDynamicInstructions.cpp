@@ -21,23 +21,10 @@ namespace {
 struct CountDynamicInstructions : public FunctionPass {
   static char ID;
   Module* module;
-  // Module* module;
-  // Constant* lib231UpdateInstr;
-  // Constant* lib231PrintInstr;
-  //LLVMContext* context;
   CountDynamicInstructions() : FunctionPass(ID) {}
 
   bool doInitialization(Module &M) override {
     module = &M;
-    // module = &M;
-    // LLVMContext& context = module->getContext();
-    //context = &(module->getContext()):
-    // lib231UpdateInstr = M.getOrInsertFunction("updateInstrInfo",Type::getVoidTy(context)
-    // ,Type::getInt32Ty(context),Type::getInt32Ptrty(context),Type::getInt32Ptrty(context));
-    //
-    // lib231PrintInstr = M.getOrInsertFunction("printOutBranchInfo",Type::getVoidTy(context));
-    //LLVMContext &context = mod.getContext();
-    //errs().write_escaped(F.getName()) << '\n';
     return false;
   }
 
@@ -46,7 +33,6 @@ struct CountDynamicInstructions : public FunctionPass {
     Constant* lib231UpdateInstr = module->getOrInsertFunction("updateInstrInfo",Type::getVoidTy(context),Type::getInt32Ty(context),Type::getInt32PtrTy(context),Type::getInt32PtrTy(context));
 
     Constant* lib231PrintInstr = module->getOrInsertFunction("printOutInstrInfo",Type::getVoidTy(context));
-    //errs() << F <<'\n';
     for (Function::iterator B = F.begin(), BE = F.end(); B != BE; ++B) {
       std::map<uint32_t,uint32_t> myMap;
       for (BasicBlock::iterator I = B->begin(), IE = B->end(); I != IE; ++I) {
@@ -78,12 +64,8 @@ struct CountDynamicInstructions : public FunctionPass {
       lib231Args.push_back(irBuilder.CreatePointerCast(values_global, Type::getInt32PtrTy(context)));
 
       irBuilder.CreateCall(lib231UpdateInstr,lib231Args);
-      // if((string)((B->getTerminator())->getOpcodeName()) == "ret"){
-      //   irBuilder.CreateCall(lib231PrintInstr);
-      // }
       for (BasicBlock::iterator I = B->begin(), IE = B->end(); I != IE; ++I) {
         if ((string) I->getOpcodeName() == "ret") {
-          errs() <<"reach ret"<<'\n';
           irBuilder.SetInsertPoint(&*I);
           irBuilder.CreateCall(lib231PrintInstr);
         }

@@ -47,7 +47,6 @@ struct BranchBias : public FunctionPass {
       }
       for (BasicBlock::iterator I = B->begin(), IE = B->end(); I != IE; ++I) {
         if ((string) I->getOpcodeName() == "ret") {
-          errs() <<"reach ret"<<'\n';
           irBuilder.SetInsertPoint(&*I);
           irBuilder.CreateCall(lib231PrintOutBranchInfo);
         }

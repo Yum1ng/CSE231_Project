@@ -11,17 +11,10 @@ struct CountStaticinstructions : public FunctionPass {
   CountStaticinstructions() : FunctionPass(ID) {}
 
   bool doInitialization(Module &) override {
-    //LLVMContext &context = mod.getContext();
-    //errs().write_escaped(F.getName()) << '\n';
     return false;
   }
 
   bool runOnFunction(Function &F) override {
-    // struct cmp_str{
-    //   bool operator()(const char* a, const char* b) const{
-    //     return std::strcmp(a, b) < 0;
-    //   }
-    // };
     std::map<const char*,int> myMap;
     for (Function::iterator B = F.begin(), BE = F.end(); B != BE; ++B) {
       for (BasicBlock::iterator I = B->begin(), IE = B->end(); I != IE; ++I) {
